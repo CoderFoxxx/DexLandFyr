@@ -126,30 +126,30 @@ public class FyrConfiguration {
                 "Is swear replies messages category enabled?");
 
         killCatMsgs = configuration.get("Messages", "killMsgs",
-                new String[]{"Я убил тебя, {player}! Я сейчас убил {ingame_kill_count} игроков, а вообще " +
-                        "{total_kill_count}."}, "Messages that will be sent when player's opponent " +
+                new String[]{"<Message>Я убил тебя, {player}! Я сейчас убил {ingame_kill_count} игроков, а вообще " +
+                        "{total_kill_count}.</Message>"}, "Messages that will be sent when player's opponent " +
                         "is killed.");
         voidKillCatMsgs = configuration.get("Messages", "voidKillMsgs",
-                new String[]{"{player}, кажется, вы упали..."}, "Messages that will be sent when their " +
+                new String[]{"<Message>{player}, кажется, вы упали...</Message>"}, "Messages that will be sent when their " +
                         "opponent dies by void");
         bedCatMsgs = configuration.get("Messages", "bedMsgs",
-                new String[]{"-кроватка, эх, стройте защиту лучше! За игру я сломал {ingame_bed_count} кроватей, " +
-                        "а вообще {total_bed_count}"}, "Messages that will be sent when player breaks the bed.");
+                new String[]{"<Message>-кроватка, эх, стройте защиту лучше! За игру я сломал {ingame_bed_count} кроватей, " +
+                        "а вообще {total_bed_count}</Message>"}, "Messages that will be sent when player breaks the bed.");
         ownBedCatMsgs = configuration.get("Messages", "ownBedMsgs",
-                new String[]{"Кажется я свою кровать потерял... Ну и ладно."}, "Messages that will be sent " +
+                new String[]{"<Message>Кажется я свою кровать потерял... Ну и ладно.</Message>"}, "Messages that will be sent " +
                         "when player's team loses their bed.");
         deathCatMsgs = configuration.get("Messages", "deathMsgs",
-                new String[]{"Ой... Хорошо, теперь сосредоточились. Я умер {ingame_death_count} раз... Face palm."},
+                new String[]{"<Message>Ой... Хорошо, теперь сосредоточились. Я умер {ingame_death_count} раз... Face palm.</Message>"},
                 "Message that will be sent when player dies.");
         voidDeathCatMsgs = configuration.get("Messages", "voidDeathMsgs",
-                new String[]{"I believe I can fly... Умер я уже {ingame_death_count} раз..."},
+                new String[]{"<Message>I believe I can fly... Умер я уже {ingame_death_count} раз...</Message>"},
                 "Message that will be sent when player dies by void.");
         gameStartCatMsgs = configuration.get("Messages", "gameStartMsgs",
-                new String[]{"gl hf!"}, "Message that will be sent when game begins");
+                new String[]{"<Message>gl hf!</Message>"}, "Message that will be sent when game begins");
         gameEndCatMsgs = configuration.get("Messages", "gameEndMsgs",
-                new String[]{"gg!"}, "Message that will be sent when game ends.");
+                new String[]{"<Message>gg!</Message>"}, "Message that will be sent when game ends.");
         swearRepliesCatMsgs = configuration.get("Messages", "swearReplies",
-                new String[]{"{player}, не выражайся!"}, "Message that will be sent in reply of swear.");
+                new String[]{"<Message>{player}, не выражайся!</Message>"}, "Message that will be sent in reply of swear.");
 
         soundsEnabled = configuration.get("SoundEffects", "enabled", false,
                 "Are event sounds enabled?");
