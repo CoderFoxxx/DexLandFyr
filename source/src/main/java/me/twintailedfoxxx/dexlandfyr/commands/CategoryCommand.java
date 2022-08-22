@@ -58,105 +58,112 @@ public class CategoryCommand extends DLFCommand
                                 "\n" + messageListToString(category));
             }
         } else {
-            MessageCategory category = MessageCategory.getByName(args[0].toLowerCase());
-            assert category.getConfigMessagesProperty() != null;
-            assert category.getToggleProperty() != null;
-            if(args.length == 1) {
-                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Детали о категории &3'"
-                        + category.getDisplayName() + "'&7:"));
-                Message.send(Message.formatColorCodes('&', "    &fБудут ли отправляться сообщения с этой кате" +
-                        "гории? " + ((category.getToggleProperty().getBoolean()) ? "&aда" : "&cнет")));
-                Message.send(Message.formatColorCodes('&', "    &fСообщения &7("
-                        + category.getConfigMessagesProperty().getStringList().length + ")&f:"));
-                outputMessageList(category);
-            } else {
-                switch (args[1]) {
-                    case "addmsg":
-                    case "am":
-                    case "addmessage":
-                    case "a":
-                        StringBuilder builder;
-                        if(args.length >= 3) {
-                            builder = new StringBuilder();
-                            for(int i = 2; i < args.length; i++) builder.append(args[i]).append(" ");
-                            addMessage(builder.toString(), category);
-                        } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
-                                "&cОшибка: &7Укажите сообщение."));
-                        break;
-                    case "messages":
-                    case "msgs":
-                    case "msglist":
-                    case "messagelist":
-                    case "listmsgs":
-                    case "listmessages":
-                    case "list":
-                    case "lm":
-                    case "ml":
-                    case "l":
-                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Сообщения из категории '" + category.getDisplayName() + "':");
-                        Message.send(Message.formatColorCodes('&', "&7      № | Сообщение"));
-                        Message.send(Message.formatColorCodes('&', "&6&m-----------------------------------------------"));
-                        outputMessageList(category);
-                        break;
-                    case "remmsg":
-                    case "removemsg":
-                    case "removemessage":
-                    case "rmmsg":
-                    case "rm":
-                    case "r":
-                        int id;
-                        if(args.length >= 3) {
-                            id = Integer.parseInt(args[2]);
-                            removeMessage(id, category);
-                        } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
-                                "&cОшибка: &7Укажите номер сообщения, которого Вы хотите удалить."));
-                        break;
-                    case "setmsg":
-                    case "setmessage":
-                    case "replacemessage":
-                    case "replacemsg":
-                    case "rplmessage":
-                    case "rplmsg":
-                    case "rpl":
-                        if(args.length >= 4) {
-                            builder = new StringBuilder();
-                            id = Integer.parseInt(args[2]);
-                            for(int i = 3; i < args.length; i++) builder.append(args[i]).append(" ");
-                            setMessage(id, builder.toString(), category);
-                        } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
-                                "&cОшибка: &7Неверное использование подкоманды! Использование: " +
-                                        DexLandFyr.INSTANCE.commandPrefix + "&ecategory &b" + args[0] + " &dsetmsg " +
-                                        "&a<№ сообщения> &6<новое сообщение>"));
-                        break;
-                    case "on":
-                    case "enable":
-                        if(!category.getToggleProperty().getBoolean()) {
-                            category.getToggleProperty().set(true);
-                            conf.reload();
-                            Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &aвключили " +
-                                    "&7категорию &e'" + category.getDisplayName() + "'&7."));
-                        } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Категория &e'" +
-                                category.getDisplayName() + "' &7уже &aвключена&7."));
-                        break;
-                    case "off":
-                    case "disable":
-                        if(category.getToggleProperty().getBoolean()) {
-                            category.getToggleProperty().set(false);
-                            conf.reload();
-                            Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &cвыключили " +
-                                    "&7категорию &e'" + category.getDisplayName() + "'&7."));
-                        } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Категория &e'" +
-                                category.getDisplayName() + "' &7уже &cвыключена&7."));
-                        break;
-                    case "clear":
-                    case "clr":
-                        clearMessages(category);
-                        break;
-                    default:
-                        Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&cОшибка: " +
-                                "&7Неизвестная подкоманда."));
-                        break;
+            try {
+                MessageCategory category = MessageCategory.getByName(args[0].toLowerCase());
+                assert category.getConfigMessagesProperty() != null;
+                assert category.getToggleProperty() != null;
+                if (args.length == 1) {
+                    Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Детали о категории &3'"
+                            + category.getDisplayName() + "'&7:"));
+                    Message.send(Message.formatColorCodes('&', "    &fБудут ли отправляться сообщения с этой кате" +
+                            "гории? " + ((category.getToggleProperty().getBoolean()) ? "&aда" : "&cнет")));
+                    Message.send(Message.formatColorCodes('&', "    &fСообщения &7("
+                            + category.getConfigMessagesProperty().getStringList().length + ")&f:"));
+                    outputMessageList(category);
+                } else {
+                    switch (args[1]) {
+                        case "addmsg":
+                        case "am":
+                        case "addmessage":
+                        case "a":
+                            StringBuilder builder;
+                            if (args.length >= 3) {
+                                builder = new StringBuilder();
+                                for (int i = 2; i < args.length; i++) builder.append(args[i]).append(" ");
+                                addMessage(builder.toString(), category);
+                            } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
+                                    "&cОшибка: &7Укажите сообщение."));
+                            break;
+                        case "messages":
+                        case "msgs":
+                        case "msglist":
+                        case "messagelist":
+                        case "listmsgs":
+                        case "listmessages":
+                        case "list":
+                        case "lm":
+                        case "ml":
+                        case "l":
+                            Message.send(DexLandFyr.MESSAGE_PREFIX + "Сообщения из категории '" + category.getDisplayName() + "':");
+                            Message.send(Message.formatColorCodes('&', "&7      № | Сообщение"));
+                            Message.send(Message.formatColorCodes('&', "&6&m-----------------------------------------------"));
+                            outputMessageList(category);
+                            break;
+                        case "remmsg":
+                        case "removemsg":
+                        case "removemessage":
+                        case "rmmsg":
+                        case "rm":
+                        case "r":
+                            int id;
+                            if (args.length >= 3) {
+                                id = Integer.parseInt(args[2]);
+                                removeMessage(id, category);
+                            } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
+                                    "&cОшибка: &7Укажите номер сообщения, которого Вы хотите удалить."));
+                            break;
+                        case "setmsg":
+                        case "setmessage":
+                        case "replacemessage":
+                        case "replacemsg":
+                        case "rplmessage":
+                        case "rplmsg":
+                        case "rpl":
+                            if (args.length >= 4) {
+                                builder = new StringBuilder();
+                                id = Integer.parseInt(args[2]);
+                                for (int i = 3; i < args.length; i++) builder.append(args[i]).append(" ");
+                                setMessage(id, builder.toString(), category);
+                            } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
+                                    "&cОшибка: &7Неверное использование подкоманды! Использование: " +
+                                            DexLandFyr.INSTANCE.commandPrefix + "&ecategory &b" + args[0] + " &dsetmsg " +
+                                            "&a<№ сообщения> &6<новое сообщение>"));
+                            break;
+                        case "on":
+                        case "enable":
+                            if (!category.getToggleProperty().getBoolean()) {
+                                category.getToggleProperty().set(true);
+                                conf.reload();
+                                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &aвключили " +
+                                        "&7категорию &e'" + category.getDisplayName() + "'&7."));
+                            } else
+                                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Категория &e'" +
+                                        category.getDisplayName() + "' &7уже &aвключена&7."));
+                            break;
+                        case "off":
+                        case "disable":
+                            if (category.getToggleProperty().getBoolean()) {
+                                category.getToggleProperty().set(false);
+                                conf.reload();
+                                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &cвыключили " +
+                                        "&7категорию &e'" + category.getDisplayName() + "'&7."));
+                            } else
+                                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Категория &e'" +
+                                        category.getDisplayName() + "' &7уже &cвыключена&7."));
+                            break;
+                        case "clear":
+                        case "clr":
+                            clearMessages(category);
+                            break;
+                        default:
+                            Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&cОшибка: " +
+                                    "&7Неизвестная подкоманда."));
+                            break;
+                    }
                 }
+            } catch (Exception ex) {
+                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&cОшибка: &7Произошла ошибка " +
+                        "во время выполнения команды. Проверьте все данные и повторите попытку снова."));
             }
         }
     }

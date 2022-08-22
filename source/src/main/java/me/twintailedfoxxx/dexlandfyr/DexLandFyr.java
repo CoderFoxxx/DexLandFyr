@@ -47,7 +47,7 @@ import java.util.Scanner;
 public class DexLandFyr {
     public static final String MODID = "dexlandfyr";
     public static final String NAME = "DexLandFyr";
-    public static final String VERSION = "1.2.2-RELEASE";
+    public static final String VERSION = "1.2.3-RELEASE";
     public static final String MESSAGE_PREFIX = Message.formatColorCodes('&', "&8[&a&lDex&f&lLand&6&lФыр&8] &7");
     public static final String UPDATE_URL = "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.8.9/versions/1.8.9/";
 
