@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Events {
     private final FyrConfiguration conf = DexLandFyr.INSTANCE.cfg;
-    private boolean gameBegan, autoMsgFlag, enteredAGame, usedLeaveCommand, bedBroken, updateChecked;
+    private boolean gameBegan, enteredAGame, usedLeaveCommand, bedBroken, updateChecked;
     private int killCount, deathCount, bedCount;
     private Stopwatch gameTimer;
 
@@ -94,8 +94,8 @@ public class Events {
                         Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&aДоступно обновление! " +
                                         "&7(&e" + pair.getFirst() + "&7). &6&nНажмите на это сообщение, " +
                                         "чтобы скачать последнюю версию мода."), MessageAction.OPEN_URL,
-                                "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.8.9/versions/1.8.9/DexLandFyr-"
-                                        + pair.getFirst() + "-1.8.9.jar",
+                                "https://github.com/CoderFoxxx/DexLandFyr/releases/download/1.8.9-RELEASE/DexLandFyr-" +
+                                        pair.getFirst() + "-1.8.9.jar",
                                 Message.formatColorCodes('&', "&6Нажмите, чтобы открыть ссылку."));
                     }
                     updateChecked = true;
@@ -130,7 +130,6 @@ public class Events {
                 event.message.contains("&") || !conf.modEnabled.getBoolean()) return;
         // TODO: Improve multicolouring tool
         if (conf.mulColorEnabled.getBoolean() && !event.message.contains("!")) {
-            autoMsgFlag = false;
             try {
                 MulticolouredString multicolor = new MulticolouredString(event.message, conf.mulColorScheme.getString(),
                         conf.mulColorMirrored.getBoolean(), conf.isMulClrDynamic.getBoolean(), 100 - 2);
@@ -166,7 +165,6 @@ public class Events {
                 enteredAGame = usedLeaveCommand = false;
                 gameBegan = true;
                 gameTimer = Stopwatch.createStarted();
-                autoMsgFlag = true;
                 if (conf.modEnabled.getBoolean() && conf.gameStartCategoryEnabled.getBoolean()) {
                     String gameStartMessage = getFormattedMessage(processPlaceholders(null, null,
                             getRandomString(gameStartMessages)));
@@ -191,7 +189,6 @@ public class Events {
             String playerName = Minecraft.getMinecraft().thePlayer.getName();
 
             if (gameBegan && message.contains("BedWars ▸") && message.contains("был убит игроком " + playerName)) {
-                autoMsgFlag = true;
                 killCount += 1;
                 if (conf.soundsEnabled.getBoolean() && conf.killSFXEnabled.getBoolean()) {
                     SoundEffect sound = SoundEffect.fromString(conf.killSFX.getString());
@@ -202,7 +199,6 @@ public class Events {
                     String killed = message.split(" ")[2];
                     String killMessage = getFormattedMessage(processPlaceholders(killed, playerName,
                             getRandomString(killMessages)));
-                    autoMsgFlag = true;
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + killMessage +
                             ((killMessage.contains("&")) ? "&r&e" : ""));
                 }
