@@ -21,7 +21,7 @@ plugins {
     id "net.minecraftforge.gradle.forge" version "2.0.2"
 }
 */
-version = "RELEASE-1.2.1"
+version = "RELEASE-1.2.2"
 group= "me.twintailedfoxxx.dexlandfyr" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "dexlandfyr"
 

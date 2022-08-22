@@ -167,7 +167,7 @@ public class Events {
                 gameBegan = true;
                 gameTimer = Stopwatch.createStarted();
                 autoMsgFlag = true;
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.gameStartCategoryEnabled.getBoolean()) {
                     String gameStartMessage = getFormattedMessage(processPlaceholders(null, null,
                             getRandomString(gameStartMessages)));
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + gameStartMessage +
@@ -198,7 +198,7 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer);
                 }
 
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.killCategoryEnabled.getBoolean()) {
                     String killed = message.split(" ")[2];
                     String killMessage = getFormattedMessage(processPlaceholders(killed, playerName,
                             getRandomString(killMessages)));
@@ -226,7 +226,7 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer);
                 }
 
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.voidKillCategoryEnabled.getBoolean()) {
                     String killed = message.split(" ")[2];
                     String killMessage = getFormattedMessage(processPlaceholders(killed, playerName,
                             getRandomString(voidKillMessages)));
@@ -252,7 +252,7 @@ public class Events {
 
             if (gameBegan && message.contains("BedWars ▸") && message.contains(playerName + " разрушил кровать команды")) {
                 bedCount += 1;
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.bedCategoryEnabled.getBoolean()) {
                     String bedBreakMessage = getFormattedMessage(processPlaceholders(playerName, null,
                             getRandomString(bedBreakMessages)));
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + bedBreakMessage +
@@ -273,7 +273,7 @@ public class Events {
             }
 
             bedBroken = true;
-            if (conf.modEnabled.getBoolean()) {
+            if (conf.modEnabled.getBoolean() && conf.ownBedBrokenCategoryEnabled.getBoolean()) {
                 String ownBedBrokenMessage = getFormattedMessage(processPlaceholders(null, null,
                         getRandomString(ownBedBrokenMessages)));
                 Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + ownBedBrokenMessage +
@@ -300,7 +300,7 @@ public class Events {
                 }
 
                 if (bedBroken) writeStats();
-                if (conf.modEnabled.getBoolean() && !bedBroken) {
+                if (!bedBroken && conf.modEnabled.getBoolean() && conf.deathCategoryEnabled.getBoolean()) {
                     String killer = (message.contains("был скинут в бездну игроком")) ? message.split(" ")[8] :
                             message.split(" ")[6];
                     String deathMessage = getFormattedMessage(processPlaceholders(null, killer,
@@ -329,7 +329,7 @@ public class Events {
                 }
 
                 if (bedBroken) writeStats();
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.voidDeathCategoryEnabled.getBoolean()) {
                     String deathMessage = getFormattedMessage(processPlaceholders(playerName, null,
                             getRandomString(deathMessages)));
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + deathMessage +
@@ -349,7 +349,7 @@ public class Events {
                 for (String sw : DexLandFyr.INSTANCE.swearDictionary) {
                     if (msg.contains("Всем") && msg.toLowerCase().contains(sw)) {
                         String swearReply = getRandomString(swearReplies);
-                        if (conf.modEnabled.getBoolean())
+                        if (conf.modEnabled.getBoolean() && conf.swearRepliesCategoryEnabled.getBoolean())
                             Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + (swearReply.contains("{dc}") ?
                                     swearReply.replace("{dc}", (!Objects.equals(conf.defaultChatColor.getString(), "null")) ?
                                                     conf.defaultChatColor.getString() : "")
@@ -387,7 +387,7 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().theWorld, Minecraft.getMinecraft().thePlayer);
                 }
 
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.gameEndCategoryEnabled.getBoolean()) {
                     String gameEndMessage = getFormattedMessage(processPlaceholders(null, null,
                             getRandomString(gameEndMessages)));
                     Minecraft.getMinecraft().thePlayer.sendChatMessage("!" + gameEndMessage + "&e");

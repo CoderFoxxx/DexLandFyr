@@ -133,8 +133,8 @@ public class FyrConfiguration {
                 new String[]{"<Message>{player}, кажется, вы упали...</Message>"}, "Messages that will be sent when their " +
                         "opponent dies by void");
         bedCatMsgs = configuration.get("Messages", "bedMsgs",
-                new String[]{"<Message>-кроватка, эх, стройте защиту лучше! За игру я сломал {ingame_bed_count} кроватей, " +
-                        "а вообще {total_bed_count}</Message>"}, "Messages that will be sent when player breaks the bed.");
+                new String[]{"<Message>-кроватка, эх, стройте защиту лучше! За игру я сломал {ingame_beds_count} кроватей, " +
+                        "а вообще {total_beds_count}</Message>"}, "Messages that will be sent when player breaks the bed.");
         ownBedCatMsgs = configuration.get("Messages", "ownBedMsgs",
                 new String[]{"<Message>Кажется я свою кровать потерял... Ну и ладно.</Message>"}, "Messages that will be sent " +
                         "when player's team loses their bed.");
