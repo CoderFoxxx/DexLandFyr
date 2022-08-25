@@ -99,6 +99,7 @@ public class Events {
                                 Message.formatColorCodes('&', "&6Нажмите, чтобы открыть ссылку."));
                     }
                     updateChecked = true;
+                    service.shutdown();
                 } catch (Exception ex) {
                     Message.send(DexLandFyr.MESSAGE_PREFIX + "Произошла ошибка во время проверки обновлений. " +
                             "Возможно, это связано с тем, что сервер не отвечает. Повторите попытку позднее.");
@@ -140,6 +141,14 @@ public class Events {
                 Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&eПредупреждение: &7" +
                         ex.getMessage()));
             }
+            event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public void ignoreHandle(ClientChatReceivedEvent event) {
+        String playerName = event.message.getUnformattedText().split(" ")[1].replace(":", "");
+        if (DexLandFyr.INSTANCE.blacklist.has(playerName)) {
             event.setCanceled(true);
         }
     }

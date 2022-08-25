@@ -26,6 +26,7 @@ package me.twintailedfoxxx.dexlandfyr;
 
 import me.twintailedfoxxx.dexlandfyr.commands.*;
 import me.twintailedfoxxx.dexlandfyr.objects.FyrConfiguration;
+import me.twintailedfoxxx.dexlandfyr.objects.PlayerBlacklist;
 import me.twintailedfoxxx.dexlandfyr.objects.Version;
 import me.twintailedfoxxx.dexlandfyr.util.Commands;
 import me.twintailedfoxxx.dexlandfyr.util.Message;
@@ -45,9 +46,9 @@ import java.util.Scanner;
 
 @Mod(modid = DexLandFyr.MODID, name = DexLandFyr.NAME, version = DexLandFyr.VERSION, clientSideOnly = true)
 public class DexLandFyr {
-    public static final String MODID = "dexlandfyr";
-    public static final String NAME = "DexLandFyr";
-    public static final String VERSION = "1.2.3-RELEASE";
+    static final String MODID = "dexlandfyr";
+    static final String NAME = "DexLandFyr";
+    public static final String VERSION = "1.3.0-RELEASE";
     public static final String MESSAGE_PREFIX = Message.formatColorCodes('&', "&8[&a&lDex&f&lLand&6&lФыр&8] &7");
     public static final String UPDATE_URL = "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.8.9/versions/1.8.9/";
 
@@ -57,8 +58,9 @@ public class DexLandFyr {
     public static Logger logger;
     public FyrConfiguration cfg;
     public Version version;
-    public ArrayList<String> swearDictionary;
-    public boolean isEnabled;
+    ArrayList<String> swearDictionary;
+    public PlayerBlacklist blacklist;
+    boolean isEnabled;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) throws IOException {
@@ -68,6 +70,7 @@ public class DexLandFyr {
         configFile = new File(event.getModConfigurationDirectory() + File.separator + "dexlandfyr.cfg");
         cfg = new FyrConfiguration(configFile);
         isEnabled = cfg.modEnabled.getBoolean();
+        blacklist = new PlayerBlacklist();
         commandPrefix = cfg.commandPrefix.getString();
         logger = event.getModLog();
         MinecraftForge.EVENT_BUS.register(new Events());
@@ -93,6 +96,7 @@ public class DexLandFyr {
         Commands.register(new SetChatColorCommand());
         Commands.register(new SoundCommand());
         Commands.register(new UpdateCheckCommand());
+        Commands.register(new IgnoreCommand());
     }
 
     @EventHandler
