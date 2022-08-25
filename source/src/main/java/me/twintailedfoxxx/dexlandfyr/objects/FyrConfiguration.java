@@ -81,6 +81,9 @@ public class FyrConfiguration {
     public Property gameEndSFXEnabled;
     public Property gameEndSFX;
 
+    // Blacklist section
+    Property playerBlacklist;
+
     public FyrConfiguration(File file) {
         this.configuration = new Configuration(file);
         configuration.load();
@@ -176,6 +179,9 @@ public class FyrConfiguration {
                 "Is game end event sound effect enabled?");
         gameEndSFX = configuration.get("SoundEffects", "gameEndSFX",
                 "minecraft:entity.villager.yes/1/1", "Game end event sound effect");
+
+        playerBlacklist = configuration.get("Blacklist", "blacklistedPlayers", new String[]{},
+                "Blacklisted players. Messages from these players will not show in Minecraft's chat.");
 
         if (configuration.hasChanged()) {
             configuration.save();
