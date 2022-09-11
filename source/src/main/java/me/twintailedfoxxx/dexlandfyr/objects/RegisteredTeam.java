@@ -24,47 +24,40 @@
 
 package me.twintailedfoxxx.dexlandfyr.objects;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import me.twintailedfoxxx.dexlandfyr.event.ClientChatEvent;
+import net.minecraft.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-public abstract class DLFCommand {
-    private final String name;
-    private final String desc;
-    private final ArrayList<String> aliases = new ArrayList<>();
+public enum RegisteredTeam {
+    RED("0_red"),
+    BLUE("0_blue"),
+    GREEN("0_green"),
+    YELLOW("0_yellow"),
+    AQUA("0_aqua"),
+    WHITE("0_white"),
+    PINK("0_light_purple"),
+    GRAY("0_gray"),
+    DEFAULT_TEAM("9_default_team");
 
-    public DLFCommand(String name, String desc, String... aliases) {
-        this.name = name;
-        this.desc = desc;
-        Collections.addAll(this.aliases, aliases);
+    private static final Map<String, RegisteredTeam> BY_NAME = new HashMap<>();
+
+    static {
+        for (RegisteredTeam team : values())
+            BY_NAME.put(team.getName(), team);
     }
 
-    public abstract void execute(EntityPlayerSP player, ClientChatEvent event, String[] args);
+    final String name;
+
+    RegisteredTeam(String name) {
+        this.name = name;
+    }
+
+    public static RegisteredTeam fromPlayersTeam(Team team) {
+        return BY_NAME.get(team.getRegisteredName());
+    }
 
     public String getName() {
         return name;
     }
-
-    public String getDescription() {
-        return desc;
-    }
-
-    public ArrayList<String> getAliases() {
-        return aliases;
-    }
-
-    public String[] getArgs() {
-        return new String[]{};
-    }
-
-    public String getHoverText() {
-        return "dummyHoverText";
-    }
-
-    public String getCommandSuggestText() {
-        return "commandSuggestDummy";
-    }
-
 }

@@ -38,7 +38,7 @@ public class Version {
             try {
                 nums[i] = Integer.parseInt(newVersionString.split("\\.")[i]);
             } catch (Exception ex) {
-                DexLandFyr.logger.log(Level.ERROR, "Failed to parse version.");
+                DexLandFyr.LOGGER.log(Level.ERROR, "Failed to parse version.");
             }
         }
     }

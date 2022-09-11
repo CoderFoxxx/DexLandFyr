@@ -48,19 +48,19 @@ import java.util.Scanner;
 public class DexLandFyr {
     static final String MODID = "dexlandfyr";
     static final String NAME = "DexLandFyr";
-    public static final String VERSION = "1.3.0-RELEASE";
+    public static final String VERSION = "1.3.1-RELEASE";
     public static final String MESSAGE_PREFIX = Message.formatColorCodes('&', "&8[&a&lDex&f&lLand&6&lФыр&8] &7");
     public static final String UPDATE_URL = "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.8.9/versions/1.8.9/";
 
     public static DexLandFyr INSTANCE = null;
     public String commandPrefix = "";
     public File configFile;
-    public static Logger logger;
+    public static Logger LOGGER;
     public FyrConfiguration cfg;
     public Version version;
     ArrayList<String> swearDictionary;
     public PlayerBlacklist blacklist;
-    boolean isEnabled;
+    public boolean isEnabled;
 
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) throws IOException {
@@ -72,7 +72,7 @@ public class DexLandFyr {
         isEnabled = cfg.modEnabled.getBoolean();
         blacklist = new PlayerBlacklist();
         commandPrefix = cfg.commandPrefix.getString();
-        logger = event.getModLog();
+        LOGGER = event.getModLog();
         MinecraftForge.EVENT_BUS.register(new Events());
 
         URL path = getClass().getClassLoader().getResource("swear_dict.txt");
@@ -101,6 +101,6 @@ public class DexLandFyr {
 
     @EventHandler
     public void init(FMLInitializationEvent event) {
-        logger.info("DexLandFyr запущен!");
+        LOGGER.info("DexLandFyr запущен!");
     }
 }

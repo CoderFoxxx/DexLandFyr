@@ -159,26 +159,26 @@ public class FyrConfiguration {
         gameStartSFXEnabled = configuration.get("SoundEffects", "gameStartSFXEnabled", true,
                 "Is game start event sound effect enabled?");
         gameStartSFX = configuration.get("SoundEffects", "gameStartSFX",
-                "minecraft:block.note.pling/1/1", "Game start sound effect");
+                "minecraft:note.pling/1/1", "Game start sound effect");
         killSFXEnabled = configuration.get("SoundEffects", "killSFXEnabled", true,
                 "Is kill event sound effect enabled?");
         killSFX = configuration.get("SoundEffects", "killSFX",
-                "minecraft:entity.experience_orb.pickup/1/2", "Kill event sound effect");
+                "minecraft:random.orb/1/2", "Kill event sound effect");
         bedDestroySFXEnabled = configuration.get("SoundEffects", "bedSFXEnabled", true);
         bedDestroySFX = configuration.get("SoundEffects", "bedSFX",
-                "minecraft:entity.enderdragon.growl/1/1", "Bed destroy event sound effect");
+                "minecraft:mob.enderdragon.growl/1/1", "Bed destroy event sound effect");
         ownBedDestroyedSFXEnabled = configuration.get("SoundEffects", "ownBedSFXEnabled", true,
                 "Is own bed destroyed event sound effect enabled?");
         ownBedDestroyedSFX = configuration.get("SoundEffects", "ownBedSFX",
-                "minecraft:entity.wither.death/1/1", "Own bed destroyed event sound effect");
+                "minecraft:mob.wither.death/1/1", "Own bed destroyed event sound effect");
         deathSFXEnabled = configuration.get("SoundEffects", "deathSFXEnabled", true,
                 "Is death event sound effect enabled?");
         deathSFX = configuration.get("SoundEffects", "deathSFX",
-                "minecraft:entity.skeleton.death/1/1", "Death event sound effect");
+                "minecraft:mob.skeleton.death/1/1", "Death event sound effect");
         gameEndSFXEnabled = configuration.get("SoundEffects", "gameEndSFXEnabled", true,
                 "Is game end event sound effect enabled?");
         gameEndSFX = configuration.get("SoundEffects", "gameEndSFX",
-                "minecraft:entity.villager.yes/1/1", "Game end event sound effect");
+                "note.pling/1/2", "Game end event sound effect");
 
         playerBlacklist = configuration.get("Blacklist", "blacklistedPlayers", new String[]{},
                 "Blacklisted players. Messages from these players will not show in Minecraft's chat.");

@@ -42,7 +42,6 @@ public class SetChatColorCommand extends DLFCommand {
                 "если у Вас есть привилегия, позволяющая писать цветные сообщения.", "defaultcolor", "setcc", "cc");
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length != 0) {
             if (Objects.equals(args[0], "reset")) {

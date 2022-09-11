@@ -27,7 +27,6 @@ package me.twintailedfoxxx.dexlandfyr.commands;
 import me.twintailedfoxxx.dexlandfyr.DexLandFyr;
 import me.twintailedfoxxx.dexlandfyr.objects.DLFCommand;
 import me.twintailedfoxxx.dexlandfyr.objects.FyrConfiguration;
-import me.twintailedfoxxx.dexlandfyr.objects.MulticolouredString;
 import me.twintailedfoxxx.dexlandfyr.util.Commands;
 import me.twintailedfoxxx.dexlandfyr.util.Message;
 import me.twintailedfoxxx.dexlandfyr.util.XMLParser;
@@ -44,12 +43,6 @@ public class MultipleColorMessageCommand extends DLFCommand {
         super("mulclr", "Установка нескольких цветов в сообщении.", "mclr", "multicolor");
     }
 
-    @Override
-    public String[] getArgs() {
-        return new String[]{"on&8/&eoff&8/&eset&8/&eperiod", "параметр"};
-    }
-
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length < 1) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! " + DexLandFyr.INSTANCE.commandPrefix + "&7&o" + getName()) + " " + Commands.argsToString(getArgs()));
@@ -136,6 +129,11 @@ public class MultipleColorMessageCommand extends DLFCommand {
     }
 
     @Override
+    public String[] getArgs() {
+        return new String[]{"on&8/&eoff&8/&eset&8/&eperiod", "параметр"};
+    }
+
+    @Override
     public String getHoverText() {
         return Message.formatColorCodes('&',
                 "&6Эта команда позволяет настраивать разноцветные сообщения. " +
@@ -185,7 +183,7 @@ public class MultipleColorMessageCommand extends DLFCommand {
                         "&6Тег &9<mulclr> &6можно использовать и в функции замены сообщения &8" + DexLandFyr.INSTANCE.
                         commandPrefix + "&ecategory &b<категория> &dsetmsg&6.\n" +
                         "\n" +
-                        "&c&lВНИМАНИЕ: &7Эта функция будет работать, если у Вас привиления &e&l[GOLD] &7 и выше!\n" +
+                        "&c&lВНИМАНИЕ: &7Эта функция будет работать, если у Вас привилегия &e&l[GOLD] &7и выше!\n" +
                         "\n" +
                         "&6&nНажмите, чтобы написать эту команду в чате!");
     }

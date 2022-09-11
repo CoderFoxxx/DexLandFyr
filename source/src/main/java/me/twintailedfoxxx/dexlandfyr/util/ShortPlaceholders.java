@@ -22,49 +22,17 @@
  * SOFTWARE.
  */
 
-package me.twintailedfoxxx.dexlandfyr.objects;
+package me.twintailedfoxxx.dexlandfyr.util;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import me.twintailedfoxxx.dexlandfyr.event.ClientChatEvent;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
-public abstract class DLFCommand {
-    private final String name;
-    private final String desc;
-    private final ArrayList<String> aliases = new ArrayList<>();
-
-    public DLFCommand(String name, String desc, String... aliases) {
-        this.name = name;
-        this.desc = desc;
-        Collections.addAll(this.aliases, aliases);
+public class ShortPlaceholders {
+    public static String process(String s) {
+        return s.replace("{ig_kc}", "{ingame_kill_count}")
+                .replace("{t_kc}", "{total_kill_count}")
+                .replace("{ig_bc}", "{ingame_beds_count}")
+                .replace("{t_bc}", "{total_beds_count}")
+                .replace("{pl}", "{player}")
+                .replace("{pl_tc}", "{player_team_color}")
+                .replace("{gt}", "{gameTimer}")
+                .replace("{tn", "{team_name");
     }
-
-    public abstract void execute(EntityPlayerSP player, ClientChatEvent event, String[] args);
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return desc;
-    }
-
-    public ArrayList<String> getAliases() {
-        return aliases;
-    }
-
-    public String[] getArgs() {
-        return new String[]{};
-    }
-
-    public String getHoverText() {
-        return "dummyHoverText";
-    }
-
-    public String getCommandSuggestText() {
-        return "commandSuggestDummy";
-    }
-
 }

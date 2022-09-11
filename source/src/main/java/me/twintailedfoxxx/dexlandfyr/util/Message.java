@@ -32,6 +32,8 @@ import net.minecraft.util.ChatComponentText;
 import java.util.Objects;
 
 public class Message {
+    private final static int CENTER_PX = 154;
+
     public static void send(String message) {
         assert Minecraft.getMinecraft().thePlayer != null;
         Minecraft.getMinecraft().thePlayer.addChatComponentMessage(Objects.requireNonNull
@@ -75,11 +77,43 @@ public class Message {
         }
     }
 
+    public static String centeredString(String msg) {
+        msg = formatColorCodes('&', msg);
+        int msgPxSize = 0;
+        boolean isBold = false;
+        boolean prevCode = false;
+
+        for (char c : msg.toCharArray()) {
+            if (c == '§')
+                prevCode = true;
+            else if (prevCode) {
+                prevCode = false;
+                isBold = c == 'l' || c == 'L';
+            } else {
+                DefaultFontInfo defFontInf = DefaultFontInfo.getDefaultFontInfo(c);
+                msgPxSize += isBold ? defFontInf.getBoldLength() : defFontInf.getLength();
+                msgPxSize += 1;
+            }
+        }
+
+        int halvedMsgPxSize = msgPxSize / 2;
+        int toCompensate = CENTER_PX - halvedMsgPxSize;
+        int spaceLen = DefaultFontInfo.SPACE.getLength() + 1;
+        int compensated = 0;
+        StringBuilder result = new StringBuilder();
+        while (compensated < toCompensate) {
+            result.append(" ");
+            compensated += spaceLen;
+        }
+
+        return result + msg;
+    }
+
     public static String formatColorCodes(char c, String s) {
         return s.replace(c, '§');
     }
 
-    public static String stripColors(String cs) {
-        return cs.replaceAll("§[0-9a-fk-or]", "");
+    public static String stripColors(String cs, char symbol) {
+        return cs.replaceAll(symbol + "[0-9a-fk-or]", "");
     }
 }

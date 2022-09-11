@@ -34,11 +34,11 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
-public class VersionChecker implements Callable<Pair<String, Boolean>> {
-    public Pair<String, Boolean> call() {
+public class VersionChecker implements Callable<Pair<String[], Boolean>> {
+    public Pair<String[], Boolean> call() {
         boolean isLatest = true;
-        String latest;
-        Pair<String, Boolean> pair = null;
+        String[] remoteVersionFileContent;
+        Pair<String[], Boolean> pair = null;
 
         try {
             InputStream str = new URL(DexLandFyr.UPDATE_URL + "version").openStream();
@@ -47,14 +47,13 @@ public class VersionChecker implements Callable<Pair<String, Boolean>> {
             for (int length; (length = str.read(buffer)) != -1; ) {
                 result.write(buffer, 0, length);
             }
-            latest = result.toString("UTF-8");
-            Version remoteVersion = new Version(latest);
+            remoteVersionFileContent = result.toString("UTF-8").split("\\|");
+            Version remoteVersion = new Version(remoteVersionFileContent[0].replace("!", ""));
             if (remoteVersion.isGreaterThan(DexLandFyr.INSTANCE.version)) {
                 isLatest = false;
-                DexLandFyr.logger.log(Level.INFO, "There is an update for the mod. Please, update it to the latest version.");
+                DexLandFyr.LOGGER.log(Level.INFO, "There is an update for the mod. Please, update it to the latest version.");
             }
-
-            pair = new Pair<>(latest, isLatest);
+            pair = new Pair<>(remoteVersionFileContent, isLatest);
             str.close();
         } catch (Exception e) {
             e.printStackTrace();

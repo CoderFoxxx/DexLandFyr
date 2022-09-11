@@ -35,7 +35,6 @@ public class ResetSettingsCommand extends DLFCommand {
         super("reset", "Сбросить настройки мода на значения по-умолчанию.", "rst");
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         boolean d = DexLandFyr.INSTANCE.configFile.delete();
         if (d) {

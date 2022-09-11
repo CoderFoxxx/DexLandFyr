@@ -43,12 +43,6 @@ public class SoundCommand extends DLFCommand {
         super("sound", "Настройка звуков при событиях.", "snd");
     }
 
-    @Override
-    public String[] getArgs() {
-        return new String[]{"on&8/&eoff&8/&eсобытие", "on&8/&eoff&8/&eset", "minecraft:звук", "громкость", "высота"};
-    }
-
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + "Звуки:");
@@ -166,11 +160,11 @@ public class SoundCommand extends DLFCommand {
                                             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы установили новый звуковой эффект &e'" + args[2] + "'&7 для события &6'" + args[0] + "'&7 с громкостью &a" + volume + "&7 и высотой &a" + pitch + "&7."));
                                         } else {
                                             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&cОшибка: &7Неправильный формат звука."));
-                                            Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&c&lPROTIP! &7Список звуков доступен по этой ссылке: &6&nhttps://pastebin.com/vBPjnzHP"));
+                                            Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&c&lPROTIP! &7Список звуков доступен по этой ссылке: &6&nhttps://pastebin.com/HpugSwJ7"));
                                         }
                                     } catch (Exception ex) {
                                         Message.send(DexLandFyr.MESSAGE_PREFIX + "Произошла ошибка во время выполнения команды. Проверьте введенные данные и попробуйте снова.");
-                                        Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&c&lPROTIP! &7Список звуков доступен по этой ссылке: &6&nhttps://pastebin.com/vBPjnzHP"));
+                                        Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&c&lPROTIP! &7Список звуков доступен по этой ссылке: &6&nhttps://pastebin.com/HpugSwJ7"));
                                         ex.printStackTrace();
                                     }
                                 } else
@@ -182,6 +176,11 @@ public class SoundCommand extends DLFCommand {
                     break;
             }
         }
+    }
+
+    @Override
+    public String[] getArgs() {
+        return new String[]{"on&8/&eoff&8/&eсобытие", "on&8/&eoff&8/&eset", "minecraft:звук", "громкость", "высота"};
     }
 
     @Override
@@ -202,10 +201,10 @@ public class SoundCommand extends DLFCommand {
                         "\n" +
                         "&6Чтобы установить другой звук для события, используйте:\n" +
                         "&7" + DexLandFyr.INSTANCE.commandPrefix + "sound &d[&eсобытие&d] &eset &d[&bminecraft:звук&d] &d[&aгромкость&d] &d[&aвысота&d]\n" +
-                        "&fПример: &9&oКоманда &eустанавливающая &9&oзвук &bminecraft:entity.villager.death &9&oсобытию &e&odeath &9&oс громкостью и высотой, равную &a1&9&o, будет выглядеть следующим образом:\n" +
-                        "&7" + DexLandFyr.INSTANCE.commandPrefix + "sound &e&odeath &eset &bminecraft:entity.villager.death &a1 1" +
+                        "&fПример: &9&oКоманда &eустанавливающая &9&oзвук &bminecraft:mob.bat.death &9&oсобытию &e&odeath &9&oс громкостью и высотой, равную &a1&9&o, будет выглядеть следующим образом:\n" +
+                        "&7" + DexLandFyr.INSTANCE.commandPrefix + "sound &e&odeath &eset &bminecraft:mob.bat.death &a1 1" +
                         "\n" +
-                        "&c&lPROTIP! &7Список звуков Minecraft доступен по ссылке: &6&nhttps://pastebin.com/vBPjnzHP\n" +
+                        "&c&lPROTIP! &7Список звуков Minecraft 1.8.9 доступен по ссылке: &6&nhttps://pastebin.com/HpugSwJ7\n" +
                         "&6&nНажмите, чтобы написать эту команду в чат!");
     }
 

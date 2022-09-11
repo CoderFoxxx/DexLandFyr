@@ -24,6 +24,10 @@
 
 package me.twintailedfoxxx.dexlandfyr.objects;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.PositionedSound;
+import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.client.audio.SoundList;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.util.ResourceLocation;
 //import net.minecraft.util.SoundCategory;
@@ -35,7 +39,7 @@ public class SoundEffect {
     private final float volume;
     private final float pitch;
 
-    public SoundEffect(ResourceLocation loc, float volume, float pitch) {
+    private SoundEffect(ResourceLocation loc, float volume, float pitch) {
         this.soundLocation = loc;
         this.volume = volume;
         this.pitch = pitch;
@@ -50,9 +54,9 @@ public class SoundEffect {
         return new SoundEffect(new ResourceLocation(sound[0], sound[1]), volume, pitch);
     }
 
-    public void play(World lvl, EntityPlayerSP player) {
-        //lvl.playSound(player, player.posX, player.posY, player.posZ,
-                //new SoundEvent(soundLocation), SoundCategory.MASTER, volume, pitch);
+    public void play(EntityPlayerSP player) {
+        Minecraft.getMinecraft().getSoundHandler().playSound(new PositionedSoundRecord(soundLocation, volume, pitch,
+                (float) player.posX, (float) player.posY, (float) player.posZ));
     }
 
     @Override

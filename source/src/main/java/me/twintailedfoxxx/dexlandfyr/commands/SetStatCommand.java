@@ -40,12 +40,6 @@ public class SetStatCommand extends DLFCommand {
                 "setstatistic", "stat", "sstat");
     }
 
-    @Override
-    public String[] getArgs() {
-        return new String[]{"kills&8/&ebeds", "&eколичество-со-статистики"};
-    }
-
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! &8" + DexLandFyr.INSTANCE.commandPrefix + "&7&o" + getName()) + " " + Commands.argsToString(getArgs()));
@@ -75,6 +69,11 @@ public class SetStatCommand extends DLFCommand {
                     Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неизвестный тип статистики."));
             }
         }
+    }
+
+    @Override
+    public String[] getArgs() {
+        return new String[]{"kills&8/&ebeds", "&eколичество-со-статистики"};
     }
 
     @Override

@@ -39,12 +39,6 @@ public class SetCommandPrefixCommand extends DLFCommand {
         super("setcmdprefix", "Установить префикс для запускаемых команд.", "prefix");
     }
 
-    @Override
-    public String[] getArgs() {
-        return new String[]{"новый-префикс"};
-    }
-
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! " +
@@ -67,6 +61,11 @@ public class SetCommandPrefixCommand extends DLFCommand {
                         " не может содержать в себе символ аперсанта и символ пробела."));
             }
         }
+    }
+
+    @Override
+    public String[] getArgs() {
+        return new String[]{"новый-префикс"};
     }
 
     @Override

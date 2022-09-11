@@ -13,7 +13,6 @@ public class IgnoreCommand extends DLFCommand {
         super("ignore", "Управление чёрным списком игроков", "ignr");
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! " +
@@ -57,12 +56,12 @@ public class IgnoreCommand extends DLFCommand {
         return Message.formatColorCodes('&',
                 "&6Эта команда позволяет Вам добавлять игроков в чёрный список и удалять с него.\n" +
                         "\n" +
-                        "&6Чтобы добавить игрока в чёрный список, используйте команду:" +
+                        "&6Чтобы добавить игрока в чёрный список, используйте команду:\n" +
                         "&7" + DexLandFyr.INSTANCE.commandPrefix + getName() + " &badd &e[игрок]\n" +
                         "&6Чтобы удалить игрока с чёрного списка, используйте команду:\n" +
-                        "&7" + DexLandFyr.INSTANCE.commandPrefix + getName() + "&bremove &e[игрок]\n" +
+                        "&7" + DexLandFyr.INSTANCE.commandPrefix + getName() + " &bremove &e[игрок]\n" +
                         "&6Чтобы показать список заблокированных игроков, используйте команду:\n" +
-                        "&7" + DexLandFyr.INSTANCE.commandPrefix + getName() + "&blist\n" +
+                        "&7" + DexLandFyr.INSTANCE.commandPrefix + getName() + " &blist\n" +
                         "\n" +
                         "&7&oВы не будете видеть в чате сообщений, которые отправляет заблокированный Вами игрок." +
                         "\n" +

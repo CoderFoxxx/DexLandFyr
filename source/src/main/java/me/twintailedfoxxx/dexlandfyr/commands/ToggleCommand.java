@@ -39,12 +39,6 @@ public class ToggleCommand extends DLFCommand {
         super("toggle", "Включить/выключить функционал мода.", "tgl", "t");
     }
 
-    @Override
-    public String[] getArgs() {
-        return new String[]{"on&8/&eoff"};
-    }
-
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! &8.&7&o" + getName()) + " " + Commands.argsToString(getArgs()));
@@ -77,6 +71,11 @@ public class ToggleCommand extends DLFCommand {
         }
 
         Message.send(Message.formatColorCodes('&', DexLandFyr.MESSAGE_PREFIX + "Вы " + (conf.modEnabled.getBoolean() ? "&aвключили" : "&cвыключили") + " &7функционал мода."));
+    }
+
+    @Override
+    public String[] getArgs() {
+        return new String[]{"on&8/&eoff"};
     }
 
     @Override
