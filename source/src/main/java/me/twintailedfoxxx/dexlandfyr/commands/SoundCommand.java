@@ -48,7 +48,6 @@ public class SoundCommand extends DLFCommand {
         return new String[]{"on&8/&eoff&8/&eсобытие", "on&8/&eoff&8/&eset", "minecraft:звук", "громкость", "высота"};
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + "Звуки:");

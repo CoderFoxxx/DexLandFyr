@@ -26,6 +26,7 @@ package me.twintailedfoxxx.dexlandfyr.commands;
 
 import me.twintailedfoxxx.dexlandfyr.DexLandFyr;
 import me.twintailedfoxxx.dexlandfyr.objects.DLFCommand;
+import me.twintailedfoxxx.dexlandfyr.objects.FyrConfiguration;
 import me.twintailedfoxxx.dexlandfyr.objects.MessageAction;
 import me.twintailedfoxxx.dexlandfyr.objects.Pair;
 import me.twintailedfoxxx.dexlandfyr.util.Message;
@@ -39,26 +40,40 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class UpdateCheckCommand extends DLFCommand {
+    private final FyrConfiguration conf = DexLandFyr.INSTANCE.cfg;
     public UpdateCheckCommand() {
         super("updchk", "Проверить мод на доступные обновления", "update-check", "u");
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         try {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
                     "Ваша версия мода: &a" + DexLandFyr.VERSION));
             Message.send(DexLandFyr.MESSAGE_PREFIX + "Проверка на наличие обновлений...");
             ExecutorService service = Executors.newSingleThreadExecutor();
-            Future<Pair<String, Boolean>> task = service.submit(new VersionChecker());
-            Pair<String, Boolean> pair = task.get();
+            Future<Pair<String[], Boolean>> task = service.submit(new VersionChecker());
+            Pair<String[], Boolean> pair = task.get();
             if (pair.getSecond()) {
                 Message.send(DexLandFyr.MESSAGE_PREFIX + "Обновлений не найдено. У Вас самая последняя версия мода.");
             } else {
-                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&aДоступно обновление! " +
-                                "&7(&e" + pair.getFirst() + "&7). &6&nНажмите на это сообщение, " +
-                                "чтобы скачать последнюю версию мода."), MessageAction.OPEN_URL,
-                        DexLandFyr.UPDATE_URL + "DexLandFyr-" + pair.getFirst() + "-1.12.2.jar",
+                boolean isImportant = Boolean.parseBoolean(pair.getFirst()[1]);
+                String remoteVersion = pair.getFirst()[0];
+                String[] changelog = pair.getFirst()[2].split(";");
+                if(isImportant) {
+                    DexLandFyr.INSTANCE.isEnabled = false;
+                    conf.reload();
+                }
+                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&a&lДоступно новое " +
+                        "обновление! &7(&e&l" + remoteVersion + "&7)\n" +
+                        "   &3Что нового?"));
+                for(String change : changelog) {
+                    Message.send(Message.formatColorCodes('&', "    " + change));
+                }
+                Message.send(Message.formatColorCodes('&', (isImportant) ? "    &cЭто ВАЖНОЕ обновление, поэтому " +
+                        "мод был отключён." : ""));
+                Message.send(Message.formatColorCodes('&', "&6&nНажмите здесь, чтобы скачать обновление."), MessageAction.OPEN_URL,
+                        "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.8.9/versions/1.8.9/DexLandFyr-"
+                                + remoteVersion + "-1.8.9.jar",
                         Message.formatColorCodes('&', "&6Нажмите, чтобы открыть ссылку."));
             }
         } catch (InterruptedException | ExecutionException ex) {

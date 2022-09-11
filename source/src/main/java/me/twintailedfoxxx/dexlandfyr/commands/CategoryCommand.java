@@ -26,6 +26,7 @@ package me.twintailedfoxxx.dexlandfyr.commands;
 
 import me.twintailedfoxxx.dexlandfyr.DexLandFyr;
 import me.twintailedfoxxx.dexlandfyr.objects.*;
+import me.twintailedfoxxx.dexlandfyr.util.Case;
 import me.twintailedfoxxx.dexlandfyr.util.Message;
 import me.twintailedfoxxx.dexlandfyr.util.XMLParser;
 import net.minecraft.client.entity.EntityPlayerSP;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class CategoryCommand extends DLFCommand
 {
@@ -44,7 +47,6 @@ public class CategoryCommand extends DLFCommand
         super("category", "Команда для работы с автоматическими сообщениями", "cat", "c");
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if(args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + "Категории:");
@@ -335,6 +337,22 @@ public class CategoryCommand extends DLFCommand
     }
 
     private String processPlaceholders(String s) {
+        for (String m : getTeamNamePatternMatches(s)) {
+            String[] params = m.substring(11).split("_");
+            for (int i = 0; i < params.length; i++)
+                params[i] = params[i].replace("{", "")
+                        .replace("}", "");
+            StringBuilder b = new StringBuilder(Message.formatColorCodes('&', "&3&o[Имя команды: "));
+            b.append(Message.formatColorCodes('&', "&e&o" + Case.getCaseFromPlaceholder(params[0]).getDisplayName()));
+            if (Arrays.asList(params).contains("l"))
+                b.append(Message.formatColorCodes('&', "&3&o; начало с маленькой буквы"));
+            if (Arrays.asList(params).contains("c"))
+                b.append(Message.formatColorCodes('&', "&3&o; цветное"));
+            b.append("]");
+
+            s = s.replace(m, b.toString());
+        }
+
         return s.replace("{dc}", conf.defaultChatColor.getString())
                 .replace("{player}", "[имя игрока, которого Вы убили]")
                 .replace("{ingame_kill_count}", "[счётчик убийств за игру]")
@@ -346,5 +364,15 @@ public class CategoryCommand extends DLFCommand
                 .replace("{killer}",  "[имя игрока, который убил Вас]")
                 .replace("{killer_team_color}", "[цвет команды игрока, который убил Вас]")
                 .replace("{gameTimer}", "[время игры]");
+    }
+
+    private List<String> getTeamNamePatternMatches(String s) {
+        ArrayList<String> a = new ArrayList<>();
+        Matcher matcher = Pattern.compile("\\{team_name_(.*?)}").matcher(s);
+        while (matcher.find()) {
+            a.add(matcher.group());
+        }
+
+        return a;
     }
 }

@@ -79,7 +79,7 @@ public class Message {
         return s.replace(c, '§');
     }
 
-    public static String stripColors(String cs) {
-        return cs.replaceAll("§[0-9a-fk-or]", "");
+    public static String stripColors(String cs, char symbol) {
+        return cs.replaceAll(symbol + "[0-9a-fk-or]", "");
     }
 }

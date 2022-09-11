@@ -22,49 +22,49 @@
  * SOFTWARE.
  */
 
-package me.twintailedfoxxx.dexlandfyr.objects;
+package me.twintailedfoxxx.dexlandfyr.util;
 
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraftforge.client.event.ClientChatEvent;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.ArrayList;
-import java.util.Collections;
+public enum Case {
+    NOMINATIVE("n"),
+    GENITIVE("g"),
+    DATIVE("d"),
+    ACCUSATIVE("a"),
+    INSTRUMENTAL("i"),
+    PREPOSITIONAL("pre");
+    private static final Map<String, Case> BY_PLACEHOLDER = new HashMap<>();
 
-public abstract class DLFCommand {
-    private final String name;
-    private final String desc;
-    private final ArrayList<String> aliases = new ArrayList<>();
-
-    public DLFCommand(String name, String desc, String... aliases) {
-        this.name = name;
-        this.desc = desc;
-        Collections.addAll(this.aliases, aliases);
+    static {
+        for (Case c : values())
+            BY_PLACEHOLDER.put(c.getPlaceholder(), c);
     }
 
-    public abstract void execute(EntityPlayerSP player, ClientChatEvent event, String[] args);
+    final String pl;
 
-    public String getName() {
-        return name;
+    Case(String pl) {
+        this.pl = pl;
     }
 
-    public String getDescription() {
-        return desc;
+    public static Case getCaseFromPlaceholder(String s) {
+        return BY_PLACEHOLDER.get(s);
     }
 
-    public ArrayList<String> getAliases() {
-        return aliases;
+    public String getPlaceholder() {
+        return pl;
     }
 
-    public String[] getArgs() {
-        return new String[]{};
-    }
+    public String getDisplayName() {
+        switch (this) {
+            case NOMINATIVE: return "Именительный падеж";
+            case GENITIVE:  return "Родительный падеж";
+            case DATIVE: return "Дательный падеж";
+            case ACCUSATIVE: return "Винительный падеж";
+            case INSTRUMENTAL: return "Творительный падеж";
+            case PREPOSITIONAL: return "Предложный падеж";
+        }
 
-    public String getHoverText() {
-        return "dummyHoverText";
+        return null;
     }
-
-    public String getCommandSuggestText() {
-        return "commandSuggestDummy";
-    }
-
 }

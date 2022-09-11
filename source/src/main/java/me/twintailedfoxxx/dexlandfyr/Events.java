@@ -29,36 +29,31 @@ import me.twintailedfoxxx.dexlandfyr.exceptions.IllegalColorAmountException;
 import me.twintailedfoxxx.dexlandfyr.exceptions.OutOfMaximumCharactersLimitException;
 import me.twintailedfoxxx.dexlandfyr.exceptions.PeriodicityOverflowException;
 import me.twintailedfoxxx.dexlandfyr.objects.*;
-import me.twintailedfoxxx.dexlandfyr.util.Commands;
-import me.twintailedfoxxx.dexlandfyr.util.Message;
-import me.twintailedfoxxx.dexlandfyr.util.VersionChecker;
-import me.twintailedfoxxx.dexlandfyr.util.XMLParser;
+import me.twintailedfoxxx.dexlandfyr.util.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.init.MobEffects;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.client.event.ClientChatEvent;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.living.PotionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Events {
     private final FyrConfiguration conf = DexLandFyr.INSTANCE.cfg;
-    private boolean gameBegan, enteredAGame, usedLeaveCommand, bedBroken, updateChecked;
+    private boolean gameBegan, isSolo, enteredAGame, usedLeaveCommand, bedBroken, updateChecked;
     private int killCount, deathCount, bedCount;
     private Stopwatch gameTimer;
+    private GameTeam lpTeam;
 
     @SubscribeEvent
     public void onModCommandUsage(ClientChatEvent e) {
@@ -67,7 +62,7 @@ public class Events {
             if (DexLandFyr.INSTANCE.isEnabled) {
                 if (Commands.execute(cmdArgs, e, Minecraft.getMinecraft().player)) {
                     assert Minecraft.getMinecraft().player != null;
-                    DexLandFyr.logger.debug("" + Minecraft.getMinecraft().player.getName() + " executed command.");
+                    DexLandFyr.LOGGER.debug("" + Minecraft.getMinecraft().player.getName() + " executed command.");
                 } else Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неизвестная команда. " +
                         "Введите &e" + DexLandFyr.INSTANCE.commandPrefix + "help&7, чтобы узнать список команд."));
             } else
@@ -84,18 +79,31 @@ public class Events {
                 Message.send(DexLandFyr.MESSAGE_PREFIX + "Проверка на наличие обновлений...");
                 try {
                     ExecutorService service = Executors.newSingleThreadExecutor();
-                    Future<Pair<String, Boolean>> future = service.submit(new VersionChecker());
-                    Pair<String, Boolean> pair = future.get();
+                    Future<Pair<String[], Boolean>> future = service.submit(new VersionChecker());
+                    Pair<String[], Boolean> pair = future.get();
 
                     if (pair.getSecond()) {
                         Message.send(DexLandFyr.MESSAGE_PREFIX + "Обновлений не найдено. Удачной игры!");
                     } else {
-                        DexLandFyr.INSTANCE.isEnabled = false;
-                        Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&aДоступно обновление! " +
-                                        "&7(&e" + pair.getFirst() + "&7). &6&nНажмите на это сообщение, " +
-                                        "чтобы скачать последнюю версию мода."), MessageAction.OPEN_URL,
+                        String remoteVersion = pair.getFirst()[0];
+                        boolean isImportant = remoteVersion.endsWith("!");
+                        String[] changelog = pair.getFirst()[2].split(";");
+                        if(isImportant) {
+                            DexLandFyr.INSTANCE.isEnabled = false;
+                            conf.modEnabled.set(false);
+                            conf.reload();
+                        }
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&a&lДоступно новое " +
+                                "обновление! &7(&e&l" + remoteVersion + "&7)\n" +
+                                "   &3Что нового?"));
+                        for(String change : changelog) {
+                            Message.send(Message.formatColorCodes('&', "    " + change));
+                        }
+                        Message.send(Message.formatColorCodes('&', (isImportant) ? "    &cЭто ВАЖНОЕ обновление, поэтому " +
+                                "мод был отключён." : ""));
+                        Message.send(Message.formatColorCodes('&', "&6&nНажмите здесь, чтобы скачать обновление."), MessageAction.OPEN_URL,
                                 "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.12.2/versions/1.12.2/DexLandFyr-"
-                                        + pair.getFirst() + "-1.12.2.jar",
+                                        + remoteVersion + "-1.12.2.jar",
                                 Message.formatColorCodes('&', "&6Нажмите, чтобы открыть ссылку."));
                     }
                     updateChecked = true;
@@ -160,7 +168,11 @@ public class Events {
         assert player != null;
 
         if (message.contains("BedWars ▸") && message.contains(player.getName() + " подключился к игре ") &&
-                message.contains("/")) enteredAGame = true;
+                message.contains("/")) {
+            String[] spl = message.split(" ");
+            isSolo = spl[6].contains("/8");
+            enteredAGame = true;
+        }
     }
 
     @SubscribeEvent
@@ -175,16 +187,27 @@ public class Events {
                 gameBegan = true;
                 gameTimer = Stopwatch.createStarted();
                 if (conf.modEnabled.getBoolean()) {
-                    String gameStartMessage = getFormattedMessage(processPlaceholders(null, null,
-                            getRandomString(gameStartMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + gameStartMessage +
-                            ((gameStartMessage.contains("&")) ? "&e" : ""));
+                    String rnd = getRandomString(gameStartMessages);
+                    String gameStartMessage = getFormattedMessage(processPlaceholders(null,
+                            null, false, rnd));
+                    int maxChars = (gameStartMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(gameStartMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
                 if (conf.soundsEnabled.getBoolean() && conf.gameStartSFXEnabled.getBoolean()) {
                     SoundEffect sound = SoundEffect.fromString(conf.gameStartSFX.getString());
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
                 }
                 killCount = deathCount = bedCount = 0;
+
+                if(!Minecraft.getMinecraft().world.isRemote)
+                    lpTeam = GameTeam.getPlayersTeam(Minecraft.getMinecraft().player.getName());
+                else lpTeam = new GameTeam(RegisteredTeam.DEFAULT_TEAM);
             }
         }
     }
@@ -206,10 +229,17 @@ public class Events {
 
                 if (conf.modEnabled.getBoolean()) {
                     String killed = message.split(" ")[2];
-                    String killMessage = getFormattedMessage(processPlaceholders(killed, playerName,
-                            getRandomString(killMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + killMessage +
-                            ((killMessage.contains("&")) ? "&e" : ""));
+                    String rnd = getRandomString(killMessages);
+                    String killMessage = getFormattedMessage(processPlaceholders(null, killed,
+                            false, rnd));
+                    int maxChars = (killMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(killMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
             }
         }
@@ -233,10 +263,17 @@ public class Events {
 
                 if (conf.modEnabled.getBoolean()) {
                     String killed = message.split(" ")[2];
-                    String killMessage = getFormattedMessage(processPlaceholders(killed, playerName,
-                            getRandomString(voidKillMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + killMessage +
-                            ((killMessage.contains("&")) ? "&e" : ""));
+                    String rnd = getRandomString(voidKillMessages);
+                    String killMessage = getFormattedMessage(processPlaceholders(null, killed,
+                            false, rnd));
+                    int maxChars = (killMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(killMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
             }
         }
@@ -258,26 +295,32 @@ public class Events {
             if (gameBegan && message.contains("BedWars ▸") && message.contains(playerName + " разрушил кровать команды")) {
                 bedCount += 1;
                 if (conf.modEnabled.getBoolean()) {
-                    String bedBreakMessage = getFormattedMessage(processPlaceholders(playerName, null,
-                            getRandomString(bedBreakMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + bedBreakMessage +
-                            ((bedBreakMessage.contains("&")) ? "&e" : ""));
+                    String rnd = getRandomString(bedBreakMessages);
+                    String bedBreakMessage = getFormattedMessage(processPlaceholders(message,
+                            null, true, rnd));
+                    int maxChars = (bedBreakMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(bedBreakMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
             }
         }
     }
 
     @SubscribeEvent
-    public void onPotionEffectApplied(PotionEvent.PotionAddedEvent event) {
+    public void ownBedDestroyed(ClientChatReceivedEvent event) {
         ArrayList<String> ownBedBrokenMessages = new ArrayList<>(Arrays.asList(conf.ownBedCatMsgs.getStringList()));
         if (ownBedBrokenMessages.size() > 0) {
             assert Minecraft.getMinecraft().player != null;
+            assert Minecraft.getMinecraft().world != null;
+            String message = event.getMessage().getUnformattedText();
 
-            if (gameBegan && (event.getEntity() instanceof EntityPlayerSP &&
-                    !Minecraft.getMinecraft().player.capabilities.allowFlying &&
-                    event.getEntity().getName().equals(Minecraft.getMinecraft().player.getName()) &&
-                    (event.getPotionEffect().getPotion() == MobEffects.BLINDNESS ||
-                            event.getPotionEffect().getPotion() == MobEffects.SLOWNESS))) {
+            if (gameBegan && message.contains("BedWars ▸") && message.contains("разрушил кровать команды") &&
+                    message.contains(lpTeam.getTeamName(Case.NOMINATIVE, true))) {
                 if (conf.soundsEnabled.getBoolean() && conf.ownBedDestroyedSFXEnabled.getBoolean()) {
                     SoundEffect sound = SoundEffect.fromString(conf.ownBedDestroyedSFX.getString());
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
@@ -285,10 +328,18 @@ public class Events {
 
                 bedBroken = true;
                 if (conf.modEnabled.getBoolean()) {
-                    String ownBedBrokenMessage = getFormattedMessage(processPlaceholders(null, null,
-                            getRandomString(ownBedBrokenMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + ownBedBrokenMessage +
-                            ((ownBedBrokenMessage.contains("&")) ? "&e" : ""));
+                    String rnd = getRandomString(ownBedBrokenMessages);
+                    String whoBroke = message.split(" ")[3];
+                    String ownBedBrokenMessage = getFormattedMessage(processPlaceholders(null,
+                            whoBroke, false, rnd));
+                    int maxChars = (ownBedBrokenMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(ownBedBrokenMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
             }
         }
@@ -311,14 +362,25 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
                 }
 
-                if (bedBroken) writeStats();
+                if (bedBroken) {
+                    writeStats();
+                    return;
+                }
+
                 if (conf.modEnabled.getBoolean() && !bedBroken) {
+                    String rnd = getRandomString(deathMessages);
                     String killer = (message.contains("был скинут в бездну игроком")) ? message.split(" ")[8] :
                             message.split(" ")[6];
                     String deathMessage = getFormattedMessage(processPlaceholders(null, killer,
-                            getRandomString(deathMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + deathMessage +
-                            ((deathMessage.contains("&")) ? "&e" : ""));
+                            false, rnd));
+                    int maxChars = (deathMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(deathMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
             }
         }
@@ -340,12 +402,23 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
                 }
 
-                if (bedBroken) writeStats();
-                if (conf.modEnabled.getBoolean()) {
-                    String deathMessage = getFormattedMessage(processPlaceholders(playerName, null,
-                            getRandomString(deathMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + deathMessage +
-                            ((deathMessage.contains("&")) ? "&e" : ""));
+                if (bedBroken) {
+                    writeStats();
+                    return;
+                }
+
+                if (conf.modEnabled.getBoolean() && conf.voidDeathCategoryEnabled.getBoolean()) {
+                    String rnd = getRandomString(deathMessages);
+                    String deathMessage = getFormattedMessage(processPlaceholders(null,
+                            null, false, rnd));
+                    int maxChars = (deathMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(deathMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
             }
         }
@@ -394,21 +467,27 @@ public class Events {
 
             if (gameBegan && message.contains("Перезагрузка сервера через 10 секунд!") && !message.contains("→")) {
                 gameBegan = false;
+                usedLeaveCommand = false;
+                writeStats();
                 if (conf.soundsEnabled.getBoolean() && conf.gameEndSFXEnabled.getBoolean()) {
                     SoundEffect sound = SoundEffect.fromString(conf.gameEndSFX.getString());
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
                 }
 
                 if (conf.modEnabled.getBoolean()) {
-                    String gameEndMessage = getFormattedMessage(processPlaceholders(null, null,
-                            getRandomString(gameEndMessages)));
-                    Minecraft.getMinecraft().player.sendChatMessage("!" + gameEndMessage + "&e");
+                    String rnd = getRandomString(gameEndMessages);
+                    String gameEndMessage = getFormattedMessage(processPlaceholders(null,null,
+                            false, rnd));
+                    int maxChars = (gameEndMessage.contains("&")) ? 100 - 2 : 100;
+                    Tuple<String, Boolean> t = sendable(gameEndMessage, maxChars);
+                    if(t.getSecond()) {
+                        Minecraft.getMinecraft().player.sendChatMessage("!" + t.getFirst() +
+                                ((t.getFirst().contains("&")) ? "&e" : ""));
+                    } else {
+                        Message.send(DexLandFyr.MESSAGE_PREFIX + "Ваше сообщение не было отправлено.");
+                    }
                 }
-                if (gameBegan && (message.contains("bw-lobby") || message.contains("bw-")) && !message.contains("[")) {
-                    if (gameTimer.isRunning()) gameTimer.reset();
-                    writeStats();
-                }
-                usedLeaveCommand = false;
+                if (gameTimer.isRunning()) gameTimer.reset();
             }
         }
     }
@@ -451,6 +530,7 @@ public class Events {
         return formattedMessage.replace("§", "&");
     }
 
+    /*
     private String processPlaceholders(String playerNamePlhld, String killerNamePlhld, String str) {
         Team playerTeam = (playerNamePlhld != null) ? Minecraft.getMinecraft().world.getScoreboard().getPlayersTeam
                 (playerNamePlhld) : null;
@@ -473,6 +553,58 @@ public class Events {
                 .replace("{gameTimer}", String.format("%d мин. %02d сек.", gameTimer.elapsed(TimeUnit.SECONDS) / 60,
                         gameTimer.elapsed(TimeUnit.SECONDS) % 60));
     }
+    */
+
+    private String processPlaceholders(String rawMessage, String playerNamePlhld, boolean bed, String configMessage) {
+        assert Minecraft.getMinecraft().world != null;
+        if(!bed) {
+            GameTeam playerTeam;
+            if(!Minecraft.getMinecraft().world.isRemote)
+                playerTeam = (playerNamePlhld != null) ? GameTeam.getPlayersTeam(playerNamePlhld
+                        .replace(".", "")) : null;
+            else playerTeam = new GameTeam(RegisteredTeam.DEFAULT_TEAM);
+
+            for(String s : getTeamNamePatternMatches(configMessage)) {
+                String[] params = s.substring(11).split("_");
+                for(int i = 0; i < params.length; i++) params[i] = params[i].replace("{", "")
+                        .replace("}", "");
+                assert playerTeam != null;
+                String r = playerTeam.getTeamName(Case.getCaseFromPlaceholder(params[0]), false);
+                r = (Arrays.asList(params).contains("c")) ? playerTeam.getColorCode('§') + r : r;
+                configMessage = configMessage.replace(s, (Arrays.asList(params).contains("l")) ? r.toLowerCase() : r);
+            }
+
+            return configMessage.replace("{player}", (playerNamePlhld != null) ? playerNamePlhld : "")
+                    .replace("{ingame_kill_count}", String.valueOf(killCount))
+                    .replace("{total_kill_count}", String.valueOf(conf.totalKills.getInt() + killCount))
+                    .replace("{ingame_death_count}", String.valueOf(deathCount))
+                    .replace("{player_team_color}", (playerTeam != null) ? playerTeam.getColorCode('§')
+                            : "")
+                    .replace("{dc}", (!Objects.equals(conf.defaultChatColor.getString(), "null")) ?
+                            conf.defaultChatColor.getString() : "")
+                    .replace("{gameTimer}", String.format("%d мин. %02d сек.", gameTimer.elapsed(TimeUnit.SECONDS)
+                                    / 60,
+                            gameTimer.elapsed(TimeUnit.SECONDS) % 60));
+        } else {
+            GameTeam brokenTeam;
+            if(!Minecraft.getMinecraft().world.isRemote)
+                brokenTeam = GameTeam.getByString(rawMessage);
+            else brokenTeam = new GameTeam(RegisteredTeam.DEFAULT_TEAM);
+            assert brokenTeam != null;
+
+            for(String s : getTeamNamePatternMatches(configMessage)) {
+                String[] params = s.substring(11).split("_");
+                for(int i = 0; i < params.length; i++) params[i] = params[i].replace("{", "")
+                        .replace("}", "");
+                String r = brokenTeam.getTeamName(Case.getCaseFromPlaceholder(params[0]), !isSolo);
+                r = (Arrays.asList(params).contains("c")) ? brokenTeam.getColorCode('§') + r : r;
+                configMessage = configMessage.replace(s, (Arrays.asList(params).contains("l")) ? r.toLowerCase() : r);
+            }
+
+            return configMessage.replace("{ingame_beds_count}", String.valueOf(bedCount))
+                    .replace("{total_beds_count}", String.valueOf(conf.totalBeds.getInt() + bedCount));
+        }
+    }
 
     private String getRandomString(ArrayList<String> a) {
         return a.get(new Random().nextInt(a.size()));
@@ -485,5 +617,34 @@ public class Events {
         if (!usedLeaveCommand) {
             killCount = deathCount = bedCount = 0;
         }
+    }
+
+    private List<String> getTeamNamePatternMatches(String s) {
+        ArrayList<String> a = new ArrayList<>();
+        Matcher matcher = Pattern.compile("\\{team_name_(.*?)}").matcher(s);
+        while (matcher.find()) {
+            a.add(matcher.group());
+        }
+
+        return a;
+    }
+
+    private Tuple<String, Boolean> sendable(String s, int m) {
+        Tuple<String, Boolean> t;
+        if(s.length() < m) {
+            t = new Tuple<>(s, true);
+        } else {
+            Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&',
+                    "&eПредупреждение: &7Количество символов в Вашем сообщении превышает " +
+                            "максимальное количество символов " + "(" + s.length() + ", лимит: 100). " +
+                            "Пробую изменить сообщение и отправить его..."));
+            m = 100;
+            s = Message.stripColors(s, '&');
+            if(s.length() < m)
+                t = new Tuple<>(s, true);
+            else t = new Tuple<>("", false);
+        }
+
+        return t;
     }
 }

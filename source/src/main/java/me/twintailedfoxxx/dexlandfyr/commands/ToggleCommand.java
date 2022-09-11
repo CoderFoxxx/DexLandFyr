@@ -44,7 +44,6 @@ public class ToggleCommand extends DLFCommand {
         return new String[]{"on&8/&eoff"};
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! &8.&7&o" + getName()) + " " + Commands.argsToString(getArgs()));

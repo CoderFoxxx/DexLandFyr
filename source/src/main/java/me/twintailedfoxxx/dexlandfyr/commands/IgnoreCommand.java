@@ -13,7 +13,6 @@ public class IgnoreCommand extends DLFCommand {
         super("ignore", "Управление чёрным списком игроков", "ignr");
     }
 
-    @Override
     public void execute(EntityPlayerSP player, ClientChatEvent event, String[] args) {
         if (args.length == 0) {
             Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Неверное использование команды! " +
