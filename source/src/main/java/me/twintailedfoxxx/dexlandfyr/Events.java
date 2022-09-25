@@ -186,7 +186,7 @@ public class Events {
                 enteredAGame = usedLeaveCommand = false;
                 gameBegan = true;
                 gameTimer = Stopwatch.createStarted();
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.gameStartCategoryEnabled.getBoolean()) {
                     String rnd = getRandomString(gameStartMessages);
                     String gameStartMessage = getFormattedMessage(processPlaceholders(null,
                             null, false, rnd));
