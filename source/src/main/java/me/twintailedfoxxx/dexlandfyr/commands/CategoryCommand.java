@@ -70,6 +70,7 @@ public class CategoryCommand extends DLFCommand
                 conf.deathCategoryEnabled.set(false);
                 conf.voidDeathCategoryEnabled.set(false);
                 conf.swearRepliesCategoryEnabled.set(false);
+                conf.reload();
                 Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &cотключили&7 возможность " +
                         "отправлять автоматические сообщения."));
                 return;
@@ -82,6 +83,7 @@ public class CategoryCommand extends DLFCommand
                 conf.gameEndCategoryEnabled.set(true);
                 conf.deathCategoryEnabled.set(true);
                 conf.voidDeathCategoryEnabled.set(true);
+                conf.reload();
                 Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &aвключили&7 возможность " +
                         "отправлять автоматические сообщения."));
                 return;
