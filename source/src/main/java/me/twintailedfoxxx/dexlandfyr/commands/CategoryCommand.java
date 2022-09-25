@@ -60,6 +60,33 @@ public class CategoryCommand extends DLFCommand
                                 "\n" + messageListToString(category));
             }
         } else {
+            if(args[0].equalsIgnoreCase("disablemessages")) {
+                conf.killCategoryEnabled.set(false);
+                conf.voidKillCategoryEnabled.set(false);
+                conf.bedCategoryEnabled.set(false);
+                conf.ownBedBrokenCategoryEnabled.set(false);
+                conf.gameStartCategoryEnabled.set(false);
+                conf.gameEndCategoryEnabled.set(false);
+                conf.deathCategoryEnabled.set(false);
+                conf.voidDeathCategoryEnabled.set(false);
+                conf.swearRepliesCategoryEnabled.set(false);
+                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &aвключили&7 возможность " +
+                        "отправлять автоматические сообщения."));
+                return;
+            } else if (args[0].equalsIgnoreCase("enablemessages")) {
+                conf.killCategoryEnabled.set(true);
+                conf.voidKillCategoryEnabled.set(true);
+                conf.bedCategoryEnabled.set(true);
+                conf.ownBedBrokenCategoryEnabled.set(true);
+                conf.gameStartCategoryEnabled.set(true);
+                conf.gameEndCategoryEnabled.set(true);
+                conf.deathCategoryEnabled.set(true);
+                conf.voidDeathCategoryEnabled.set(true);
+                Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "Вы &cотключили&7 возможность " +
+                        "отправлять автоматические сообщения."));
+                return;
+            }
+
             MessageCategory category = MessageCategory.getByName(args[0].toLowerCase());
             assert category.getConfigMessagesProperty() != null;
             assert category.getToggleProperty() != null;
@@ -165,7 +192,7 @@ public class CategoryCommand extends DLFCommand
 
     @Override
     public String[] getArgs() {
-        return new String[] { "категория", "&7(&eaddmsg&8/&eaddmessage&8/&eam&7)&6/&7(&esetmsg&8/&esetmessage&8/&ereplacemessage&8" +
+        return new String[] { "enablemessages&8/&edisablemessages&8/&eкатегория", "&7(&eaddmsg&8/&eaddmessage&8/&eam&7)&6/&7(&esetmsg&8/&esetmessage&8/&ereplacemessage&8" +
                 "/&ereplacemsg&8/&erplmessage&8/&erplmsg&8/&erpl&7)&6/&7(&eremmsg&8/&eremovemsg&8/&ermmsg&8/&erm&7)&6/" +
                 "&7(&emessages&8/&emsgs&8/&emsglist&8/&emessagelist&8/&elistmsgs&8/&elistmessages&8/&elist&8/&elm&8/&eml" +
                 "&8/&el&7)&6/&7(&eon&8/&eoff&7)&6/&7(&eclear&8/&eclr&7)", "параметр" };

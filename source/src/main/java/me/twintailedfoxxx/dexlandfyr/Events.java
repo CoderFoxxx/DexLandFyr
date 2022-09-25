@@ -227,7 +227,7 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
                 }
 
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.killCategoryEnabled.getBoolean()) {
                     String killed = message.split(" ")[2];
                     String rnd = getRandomString(killMessages);
                     String killMessage = getFormattedMessage(processPlaceholders(null, killed,
@@ -261,7 +261,7 @@ public class Events {
                     sound.play(Minecraft.getMinecraft().world, Minecraft.getMinecraft().player);
                 }
 
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.voidDeathCategoryEnabled.getBoolean()) {
                     String killed = message.split(" ")[2];
                     String rnd = getRandomString(voidKillMessages);
                     String killMessage = getFormattedMessage(processPlaceholders(null, killed,
@@ -294,7 +294,7 @@ public class Events {
 
             if (gameBegan && message.contains("BedWars ▸") && message.contains(playerName + " разрушил кровать команды")) {
                 bedCount += 1;
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.bedCategoryEnabled.getBoolean()) {
                     String rnd = getRandomString(bedBreakMessages);
                     String bedBreakMessage = getFormattedMessage(processPlaceholders(message,
                             null, true, rnd));
@@ -327,7 +327,7 @@ public class Events {
                 }
 
                 bedBroken = true;
-                if (conf.modEnabled.getBoolean()) {
+                if (conf.modEnabled.getBoolean() && conf.ownBedBrokenCategoryEnabled.getBoolean()) {
                     String rnd = getRandomString(ownBedBrokenMessages);
                     String whoBroke = message.split(" ")[3];
                     String ownBedBrokenMessage = getFormattedMessage(processPlaceholders(null,
@@ -367,7 +367,7 @@ public class Events {
                     return;
                 }
 
-                if (conf.modEnabled.getBoolean() && !bedBroken) {
+                if ((conf.modEnabled.getBoolean() && conf.deathCategoryEnabled.getBoolean()) && !bedBroken) {
                     String rnd = getRandomString(deathMessages);
                     String killer = (message.contains("был скинут в бездну игроком")) ? message.split(" ")[8] :
                             message.split(" ")[6];

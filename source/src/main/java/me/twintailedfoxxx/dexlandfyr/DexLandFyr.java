@@ -48,7 +48,7 @@ import java.util.Scanner;
 public class DexLandFyr {
     public static final String MODID = "dexlandfyr";
     public static final String NAME = "DexLandFyr";
-    public static final String VERSION = "1.3.1-RELEASE";
+    public static final String VERSION = "1.3.2-RELEASE";
     public static final String MESSAGE_PREFIX = Message.formatColorCodes('&', "&8[&a&lDex&f&lLand&6&lФыр&8] &7");
     public static final String UPDATE_URL = "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.12.2/versions/1.12.2/";
 
@@ -69,6 +69,10 @@ public class DexLandFyr {
         swearDictionary = new ArrayList<>();
         configFile = new File(event.getModConfigurationDirectory() + File.separator + "dexlandfyr.cfg");
         cfg = new FyrConfiguration(configFile);
+        if(!cfg.modEnabled.getBoolean()) {
+            cfg.modEnabled.set(true);
+            cfg.reload();
+        }
         isEnabled = cfg.modEnabled.getBoolean();
         blacklist = new PlayerBlacklist();
         commandPrefix = cfg.commandPrefix.getString();

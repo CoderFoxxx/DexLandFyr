@@ -56,11 +56,12 @@ public class UpdateCheckCommand extends DLFCommand {
             if (pair.getSecond()) {
                 Message.send(DexLandFyr.MESSAGE_PREFIX + "Обновлений не найдено. У Вас самая последняя версия мода.");
             } else {
-                boolean isImportant = Boolean.parseBoolean(pair.getFirst()[1]);
                 String remoteVersion = pair.getFirst()[0];
+                boolean isImportant = remoteVersion.endsWith("!");
                 String[] changelog = pair.getFirst()[2].split(";");
                 if(isImportant) {
                     DexLandFyr.INSTANCE.isEnabled = false;
+                    conf.modEnabled.set(false);
                     conf.reload();
                 }
                 Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&a&lДоступно новое " +
