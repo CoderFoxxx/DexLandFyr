@@ -87,7 +87,7 @@ public class Events {
                     } else {
                         String remoteVersion = pair.getFirst()[0];
                         boolean isImportant = remoteVersion.endsWith("!");
-                        String[] changelog = pair.getFirst()[2].split(";");
+                        String[] changelog = pair.getFirst()[1].split(";");
                         if(isImportant) {
                             DexLandFyr.INSTANCE.isEnabled = false;
                             conf.modEnabled.set(false);
