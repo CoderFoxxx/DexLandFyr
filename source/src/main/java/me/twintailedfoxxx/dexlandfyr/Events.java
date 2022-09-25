@@ -94,7 +94,7 @@ public class Events {
                             conf.reload();
                         }
                         Message.send(DexLandFyr.MESSAGE_PREFIX + Message.formatColorCodes('&', "&a&lДоступно новое " +
-                                "обновление! &7(&e&l" + remoteVersion + "&7)\n" +
+                                "обновление! &7(&e&l" + remoteVersion.replace("!", "") + "&7)\n" +
                                 "   &3Что нового?"));
                         for(String change : changelog) {
                             Message.send(Message.formatColorCodes('&', "    " + change));
@@ -103,7 +103,7 @@ public class Events {
                                 "мод был отключён." : ""));
                         Message.send(Message.formatColorCodes('&', "&6&nНажмите здесь, чтобы скачать обновление."), MessageAction.OPEN_URL,
                                 "https://raw.githubusercontent.com/CoderFoxxx/DexLandFyr/1.12.2/versions/1.12.2/DexLandFyr-"
-                                        + remoteVersion + "-1.12.2.jar",
+                                        + remoteVersion.replace("!", "") + "-1.12.2.jar",
                                 Message.formatColorCodes('&', "&6Нажмите, чтобы открыть ссылку."));
                     }
                     updateChecked = true;
